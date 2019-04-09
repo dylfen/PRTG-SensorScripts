@@ -1,0 +1,116 @@
+# SFBCalls.ps1
+# Build appon the script at https://kb.paessler.com/en/topic/63184-how-to-lync-2013-monitoring 
+# Edited by Dan Christensen
+# Loading current sip client connections as performance counter
+#
+    
+param (
+	[string]$server= "",
+    [string]$username= "",
+    [string]$password= ""
+)
+#Debug
+$enableDebug =          $false
+
+# Enable Channels 
+$enableSipClients =     $true
+$enableInboundCalls =   $true
+$enableOutboundCalls =  $true
+$enableTotalCalls =     $true
+
+
+$SecPasswd = ConvertTo-SecureString $Password -AsPlainText -Force 
+$Credentials= New-Object System.Management.Automation.PSCredential ($Username, $secpasswd) 
+
+if($enableDebug){
+    write-host "Start PRTG Sensor`r`n" 
+    write-host "Server(s): $Server `r`n"
+}
+$serverlist = $server.split(",")
+$serverCount = $Serverlist.count
+if($enableDebug){
+    write-host "Serverlist count: $serverCount `r`n" 
+}
+$result='<?xml version="1.0" encoding="UTF-8" ?><prtg>'
+
+
+foreach ($server in $serverlist){
+    
+    if($enableDebug){
+        write-host "Getting counters from server:  $server `r`n"
+        if($enableSipClients) {
+        $value1 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:SIP - Peers(Clients)\SIP - Connections Active"  | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        write-host "SIP Clients returned: " $value1.CookedValue }
+        if($enableInboundCalls) {
+        $value2 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:MediationServer - Inbound Calls(_Total)\- Current" | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        write-host "Inbound calls returned: " $value2.CookedValue }
+        if($enableOutboundCalls) {
+        $value3 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:MediationServer - Outbound Calls(_Total)\- Current" | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        write-host "Outbound calls returned: " $value3.CookedValue }
+        if($enableTotalCalls) {
+        $value4 = $value2.CookedValue + $value3.CookedValue
+        write-host "Total calls (inbound + ourbound): " $value4 }
+    } else {
+        $value1 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:SIP - Peers(Clients)\SIP - Connections Active" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        $value2 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:MediationServer - Inbound Calls(_Total)\- Current" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        $value3 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:MediationServer - Outbound Calls(_Total)\- Current" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        $value4 = $value2.CookedValue + $value3.CookedValue
+    }
+	if ($error) {
+        if($enableDebug){
+        # Skip Counters
+            write-host "Server: $server Unable to read $counter `r`n"
+        }
+		$error.clear()
+	}
+	else  {
+        if($enableSipClients) {
+            $result+="  <result>"
+            $result+="    <channel>SIP Clients("+$server+")</channel>"
+            $result+="    <value>"+$value1.CookedValue+"</value>"
+            $result+="    <unit>Count</unit>"
+            $result+="    <mode>Absolute</mode>"
+            $result+="  </result>"
+            }
+        if($enableInboundCalls) {
+            $result+="  <result>"
+            $result+="    <channel>Inbound Calls("+$server+")</channel>"
+            $result+="    <value>"+$value2.CookedValue+"</value>"
+            $result+="    <unit>Count</unit>"
+            $result+="    <mode>Absolute</mode>"
+            $result+="  </result>"
+        }
+        if($enableOutboundCalls) {
+            $result+="  <result>"
+            $result+="    <channel>Outbound Calls("+$server+")</channel>"
+            $result+="    <value>"+$value3.CookedValue+"</value>"
+            $result+="    <unit>Count</unit>"
+            $result+="    <mode>Absolute</mode>"
+            $result+="  </result>"
+        }
+        if($enableTotalCalls) {
+            $result+="  <result>"
+            $result+="    <channel>Total Calls("+$server+")</channel>"
+            $result+="    <value>"+$value4+"</value>"
+            $result+="    <unit>Count</unit>"
+            $result+="    <mode>Absolute</mode>"
+            $result+="  </result>"
+        }
+	}
+}
+
+$result+="</prtg>"
+if($enableDebug){
+    write-host "End: ExitCode " $error.count " `r`n"
+    Write-host "Sending Result to output pipeline`r`n"
+}
+write-host $result
+# Clear $result
+$result =""
+
+if ($error) {
+    if($enableDebug){
+        write-host "Found Errors`r`n"
+    }
+	EXIT 1
+}
