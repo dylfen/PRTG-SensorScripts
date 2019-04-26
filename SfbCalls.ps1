@@ -5,7 +5,7 @@ Retrieves current connected clients, current active conference calls, inbound ca
 .DESCRIPTION
 The SfbCalls.ps1 script gets the current values from your S4B FE server via counters. The XML output can be used as PRTG custom sensor.
 
-.PARAMETER Server 
+.PARAMETER Server (requirement)
 Represents the server you will connect to. HOSTNAME or IP
 
 .PARAMETER Username (requirement)
@@ -46,7 +46,7 @@ https://github.com/dylfen
 #>
     
 param (
-	[string]$server= "",
+    [string]$server= "",
     [string]$username= "",
     [string]$password= ""
 )
