@@ -1,4 +1,4 @@
-﻿param (
+param (
     [string]$server= "",
     [string]$username= "",
     [string]$password= ""
@@ -356,7 +356,7 @@ $result+="    <value>"+$value30.CookedValue+"</value>"
 $result+="    <unit>Count</unit>"
 $result+="    <mode>Absolute</mode>"
 $result+="    <LimitMode>1</LimitMode>"
-$result+="    <LimitMaxError>0</LimitMaxError>"
+$result+="    <LimitMaxError>2</LimitMaxError>"
 $result+="    <LimitMaxWarning>1</LimitMaxWarning>"
 $result+="  </result>"
 
