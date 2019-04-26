@@ -9,10 +9,10 @@ The DateSensor.ps1 script count the days to a given day. You can set the days be
 .PARAMETER Date (requirement)
 Represents the date in date format YYYY-MM-DD
 
-.PARAMETER $DaysForWarning (requirement)
+.PARAMETER DaysForWarning (requirement)
 Represents the number of days before getting a WARNING in PRTG. 0 = no warning
 
-.PARAMETER $DaysForError (requirement)
+.PARAMETER DaysForError (requirement)
 Represents the number of days before getting a ERROR in PRTG. 0 = no error
 
 .EXAMPLE
