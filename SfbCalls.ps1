@@ -1,7 +1,41 @@
-# SFBCalls.ps1
-# Build appon the script at https://kb.paessler.com/en/topic/63184-how-to-lync-2013-monitoring 
-# Edited by Dan Christensen
-# Loading current sip client connections as performance counter
+
+<#
+.SYNOPSIS
+Retrieves current connected clients, current active conference calls, inbound calls, outbound calls and total calls (inbound + outbound)
+
+.DESCRIPTION
+The SfbCalls.ps1 script gets the current values from your S4B FE server via counters. The XML output can be used as PRTG custom sensor.
+
+.PARAMETER Server 
+Represents the server you will connect to. HOSTNAME or IP
+
+.PARAMETER Username (requirement)
+Represents the username for authentication to the server
+
+.PARAMETER Password (requirement)
+Represents the password for authentication to the server
+
+.EXAMPLE
+Retrieves counters from SFB FE server.
+SfbCalls.ps1 -server "MySfbServer" -noprofile -executionpolicy bypass -UserName MyDomain\sfbadmin -Password "12345"
+
+.NOTES
+Usage in PRTG:
+1. Add the SfbCalls.ps1 to "PRTG Network Monitor\Custom Sensors\EXEXML" folder.
+2. Create a new "EXE/Script Advanced" sensor.
+3. Choose the script SfbCalls.ps1 under EXE/Script
+4. Enter the following in parameters: -server "YOURSERVER" -noprofile -executionpolicy bypass -UserName %windowsdomain\%windowsuser -Password "%windowspassword"
+5. Save
+6. Enjoy
+
+Author:  Dan Christensen   
+
+.LINK
+https://github.com/dylfen
+
+.CREDITS
+Original Script: https://kb.paessler.com/en/topic/63184-how-to-lync-2013-monitoring 
+#>
     
 param (
 	[string]$server= "",
