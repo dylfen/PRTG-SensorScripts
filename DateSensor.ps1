@@ -1,4 +1,44 @@
-﻿Param([datetime]$Date,
+<#
+.SYNOPSIS
+Count the days until a set date. 
+
+.DESCRIPTION
+Usefull to remind you of domain renewal, SSL certificate renewal or just count down to New Year.
+The DateSensor.ps1 script count the days to a given day. You can set the days before warning and error state. The XML output can be used as PRTG custom sensor.
+
+.PARAMETER Date (requirement)
+Represents the date in date format YYYY-MM-DD
+
+.PARAMETER $DaysForWarning (requirement)
+Represents the number of days before getting a WARNING in PRTG. 0 = no warning
+
+.PARAMETER $DaysForError (requirement)
+Represents the number of days before getting a ERROR in PRTG. 0 = no error
+
+.EXAMPLE
+Count the days to New Year 19/20. Set warning limit to 30 days and error limit to 5.
+DateSendor.ps1 -date 2019-12-31 -DaysForWarning 30 -DaysForError 5
+
+Count the days to New Year 19/20. Set warning limit to 10 days.
+DateSendor.ps1 -date 2019-12-31 -DaysForWarning 10 -DaysForError 0
+
+
+.NOTES
+Usage in PRTG:
+1. Add the DateSendor.ps1 to "PRTG Network Monitor\Custom Sensors\EXEXML" folder.
+2. Create a new "EXE/Script Advanced" sensor.
+3. Choose the script DateSendor.ps1 under EXE/Script
+4. Enter the following in parameters: -date YYYY-MM-DD -DaysForWarning 30 -DaysForError 5
+5. Save
+6. Enjoy
+
+Author:  Dan Christensen   
+
+.LINK
+https://github.com/dylfen
+
+#>
+Param([datetime]$Date,
       [int]$DaysForWarning,
       [int]$DaysForError
 )
