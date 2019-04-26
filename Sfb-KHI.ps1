@@ -5,7 +5,7 @@ Retrieves 38 HKIs (Key Health Indicators) fron your SFB FE server
 .DESCRIPTION
 The Sfb-KHI.ps1 script gets the current KHI values from your S4B FE server via counters. The XML output can be used as PRTG custom sensor.
 
-.PARAMETER Server 
+.PARAMETER Server (requirement)
 Represents the server you will connect to. HOSTNAME or IP
 
 .PARAMETER Username (requirement)
