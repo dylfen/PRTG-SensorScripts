@@ -2,21 +2,23 @@
 # Build appon the script at https://kb.paessler.com/en/topic/63184-how-to-lync-2013-monitoring 
 # Edited by Dan Christensen
 # Loading current sip client connections as performance counter
-#
     
 param (
 	[string]$server= "",
     [string]$username= "",
     [string]$password= ""
 )
-#Debug
-$enableDebug =          $false
 
-# Enable Channels 
+#Debug - $true or $false
+$enableDebug =          $false  
+
+# Enable Channels - $true or $false
 $enableSipClients =     $true
 $enableInboundCalls =   $true
 $enableOutboundCalls =  $true
 $enableTotalCalls =     $true
+$enableActiveConfCalls =$true
+
 
 
 $SecPasswd = ConvertTo-SecureString $Password -AsPlainText -Force 
@@ -50,11 +52,15 @@ foreach ($server in $serverlist){
         if($enableTotalCalls) {
         $value4 = $value2.CookedValue + $value3.CookedValue
         write-host "Total calls (inbound + ourbound): " $value4 }
+		if($enableActiveConfCalls) {
+        $value5 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:USrv - Pool Conference Statistics\USrv - Active Conference Count" | select -ExpandProperty CounterSamples)} -Credential $Credentials
+        write-host "Active Conference Calls: " $value5.CookedValue }
     } else {
         $value1 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:SIP - Peers(Clients)\SIP - Connections Active" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
         $value2 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:MediationServer - Inbound Calls(_Total)\- Current" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
         $value3 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:MediationServer - Outbound Calls(_Total)\- Current" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
         $value4 = $value2.CookedValue + $value3.CookedValue
+        $value5 = Invoke-Command -Computername $server -ScriptBlock {(Get-Counter "\LS:USrv - Pool Conference Statistics\USrv - Active Conference Count" -ErrorAction silentlycontinue | select -ExpandProperty CounterSamples)} -Credential $Credentials
     }
 	if ($error) {
         if($enableDebug){
@@ -96,6 +102,15 @@ foreach ($server in $serverlist){
             $result+="    <mode>Absolute</mode>"
             $result+="  </result>"
         }
+        if($enableActiveConfCalls) {
+            $result+="  <result>"
+            $result+="    <channel>Active Conference Calls("+$server+")</channel>"
+            $result+="    <value>"+$value5.CookedValue+"</value>"
+            $result+="    <unit>Count</unit>"
+            $result+="    <mode>Absolute</mode>"
+            $result+="  </result>"
+        }
+
 	}
 }
 
