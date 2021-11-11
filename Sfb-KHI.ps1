@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Retrieves 38 HKIs (Key Health Indicators) fron your SFB FE server
 
@@ -30,7 +30,7 @@ Usage in PRTG:
 Author:  Dan Christensen   
 
 .LINK
-https://github.com/dylfen
+https://gitlab.com/dylfen/
 
 #>
 
