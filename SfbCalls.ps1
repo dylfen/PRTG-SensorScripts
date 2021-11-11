@@ -41,7 +41,7 @@ Usage in PRTG:
 Author:  Dan Christensen   
 
 .LINK
-https://github.com/dylfen
+https://gitlab.com/dylfen/
 
 #>
     
